@@ -1,0 +1,118 @@
+#ifndef PC_H
+#define PC_H
+    #include "util.h"
+    #include "items.h"
+    #include "glover/worlds.h"
+
+    typedef struct {
+        u8 hub_entrance; //1 = atlantis, 7 = training
+        u8 door; //1 = door 1, 5 = bonus
+        u8 warp_offset_id;
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+            u16 object_id;
+            u8 revealed;
+        } garibs[80];
+        u8 all_collected;
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+        } enemy_checks[15];
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+            u8 revealed;
+        } life_checks[10];
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+            u8 active;
+            struct {
+                struct{
+                    char text[21];
+                } lines[6];
+                u8 last_line;
+            } tip_text;
+        } tip_checks[15];
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+            u32 warp_ptr;
+        } checkpoint_checks[5];
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+            u16 object_type;
+        } switch_checks[11];
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+        } potion_checks[9];
+        u8 goal;
+        u8 star;
+    } worlds_t;
+
+    typedef struct {
+        u8 hub_order[AP_MAX_HUB]; 
+        u8 hub_map;
+        u8 world_map;
+        u16 id_gen;
+        u8 current_world_key;
+        u16 garib_totals[AP_MAX_WORLDS];
+        u16 max_garib_totals[AP_MAX_WORLDS];
+        u8 secret_unlock[AP_MAX_HUB];
+        struct {
+            u8 garib_logic;
+            u8 randomize_checkpoints;
+            u8 checkpoint_items;
+            u8 randomize_switches;
+            u8 deathlink;
+            u8 taglink;
+            u8 tip_hints;
+            u8 inverse;
+            u8 random_sounds;
+            u8 portals;
+            u16 trap_timer;
+        } settings;
+        u8 items[AP_MAX_ITEM];
+        struct {
+            char text[31];
+        } text_queue[100];
+        u8 send_text;
+        u8 text_ready;
+        u8 need_respawn;
+        u8 respawned;
+        u8 n64_text;
+        u8 n64_deathlink;
+        u8 n64_taglink;
+        u8 n64_items[AP_MAX_ITEM];
+        u8 version_major;
+        u8 version_minor;
+        u8 version_patch;
+        worlds_t worlds[AP_MAX_WORLDS];
+        struct {
+            u32 ptr;
+            u16 id;
+            u8 collected;
+            u8 active;
+            struct {
+                struct{
+                    char text[21];
+                } lines[6];
+                u8 last_line;
+            } tip_text;
+        } wayroom_tip_checks[6];
+        u8 chicken;
+        u32 last_tip_ptr;
+        bool forcechange;
+    } ap_memory_pc_t;
+
+#endif

@@ -1,0 +1,31 @@
+#ifndef WORLDS_H
+#define WORLDS_H
+    #include "worlds/atlantis_1.h"
+    #include "worlds/atlantis_2.h"
+    #include "worlds/atlantis_3.h"
+    #include "worlds/atlantis_bonus.h"
+    #include "worlds/carnival_1.h"
+    #include "worlds/carnival_2.h"
+    #include "worlds/carnival_3.h"
+    #include "worlds/carnival_bonus.h"
+    #include "worlds/pirates_1.h"
+    #include "worlds/pirates_2.h"
+    #include "worlds/pirates_3.h"
+    #include "worlds/pirates_bonus.h"
+    #include "worlds/prehistoric_1.h"
+    #include "worlds/prehistoric_2.h"
+    #include "worlds/prehistoric_3.h"
+    #include "worlds/prehistoric_bonus.h"
+    #include "worlds/fear_1.h"
+    #include "worlds/fear_2.h"
+    #include "worlds/fear_3.h"
+    #include "worlds/fear_bonus.h"
+    #include "worlds/space_1.h"
+    #include "worlds/space_2.h"
+    #include "worlds/space_3.h"
+    #include "worlds/space_bonus.h"
+    #include "worlds/training.h"
+    #include "worlds/wayroom.h"
+
+    void InitLocationIds();
+#endif

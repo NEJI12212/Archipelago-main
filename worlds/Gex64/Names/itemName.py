@@ -1,0 +1,8 @@
+RED_REMOTE = "Red Remote"
+SILVER_REMOTE = "Silver Remote"
+GOLD_REMOTE = "Gold Remote"
+GILLIGEX_REMOTE = "Gilligex Remote"
+MOOSHOO_REMOTE = "Mooshoo Remote"
+GEXZILLA_REMOTE = "GexZilla_Remote"
+REZ_REMOTE = "Rez Remote"
+Victory = "Victory Condition"

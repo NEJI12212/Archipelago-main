@@ -1,0 +1,4 @@
+*.z64
+*.n64
+n64/tools/armips.exe
+/n64/tools/mips64

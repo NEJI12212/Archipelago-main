@@ -1,0 +1,126 @@
+.align 0x08
+display_dialog:
+LD V0, 0x0020 (SP)
+SW V0, 0x0010 (SP)
+LD V0, 0x0028 (SP)
+SW V0, 0x0014 (SP)
+LD V0, 0x0030 (SP)
+SW V0, 0x0018 (SP)
+LD V0, 0x0038 (SP)
+SW V0, 0x001C (SP)
+LD V0, 0x0040 (SP)
+SW V0, 0x0020 (SP)
+LD V0, 0x0048 (SP)
+SW V0, 0x0024 (SP)
+LD V0, 0x0050 (SP)
+SW V0, 0x0028 (SP)
+J 0x801469E4
+NOP
+
+.align 0x08
+checkpointItemPauseDisplaced:
+SD V1, 0x0010 (SP)
+SD A0, 0x0018 (SP)
+SD A1, 0x0020 (SP)
+SD A2, 0x0028 (SP)
+JAL checkpointItemPauseSelect
+NOP
+LD V1, 0x0010 (SP)
+LD A0, 0x0018 (SP)
+LD A1, 0x0020 (SP)
+LD A2, 0x0028 (SP)
+J 0x80126A40
+NOP
+
+.align 0x08
+checkpointItemPauseSelectDisplaced:
+SD V1, 0x0010 (SP)
+SD A0, 0x0018 (SP)
+SD A1, 0x0020 (SP)
+SD A2, 0x0028 (SP)
+JAL checkpointItemPauseSelect
+NOP
+LD V1, 0x0010 (SP)
+LD A0, 0x0018 (SP)
+LD A1, 0x0020 (SP)
+LD A2, 0x0028 (SP)
+J 0x80126C7C
+NOP
+
+.align 0x08
+TipTextDisplaced:
+SD A0, 0x0050 (SP)
+SD A1, 0x0058 (SP)
+SD A2, 0x0060 (SP)
+SD A3, 0x0068 (SP)
+SD V1, 0x0070 (SP)
+JAL TipText
+ADDIU A0, V0, 0x0000
+LD A0, 0x0050 (SP)
+LD A1, 0x0058 (SP)
+LD A2, 0x0060 (SP)
+LD A3, 0x0068 (SP)
+LD V1, 0x0070 (SP)
+J 0x801B86A0
+NOP
+
+.align 0x08
+PlatformSwitchDisplaced:
+SD A0, 0x0050 (SP)
+SD A1, 0x0058 (SP)
+SD A2, 0x0060 (SP)
+SD A3, 0x0068 (SP)
+SD V1, 0x0070 (SP)
+SD V0, 0x0078 (SP)
+JAL PlatformSwitch
+ADDIU A0, V0, 0x0000
+LD A0, 0x0050 (SP)
+LD A1, 0x0058 (SP)
+LD A2, 0x0060 (SP)
+LD A3, 0x0068 (SP)
+LD V1, 0x0070 (SP)
+LD V0, 0x0078 (SP)
+JAL 0x801748D0
+NOP
+J 0x8017252C
+
+.align 0x08
+.function MoveBarrierDisplaced
+    SWC1 F20, 0x00B8 (V0)
+    LD V0, 0x0038 (SP)
+    LD A0, 0x0010 (SP)
+    LD A1, 0x0018 (SP)
+    LD A2, 0x0020 (SP)
+    LD A3, 0x0028 (SP)
+    LD V1, 0x0030 (SP)
+    LD V0, 0x0038 (SP)
+    LD S0, 0x0040 (SP)
+    ADDIU S0, S0, 0x0001
+    J 0x801202D8
+    NOP
+.endfunction
+
+.align 0x08
+PortalBarrierDisplaced:
+SD A0, 0x0010 (SP)
+SD A1, 0x0018 (SP)
+SD A2, 0x0020 (SP)
+SD A3, 0x0028 (SP)
+SD V1, 0x0030 (SP)
+SD V0, 0x0038 (SP)
+SD S0, 0x0040 (SP)
+ADDIU A1, A0, 0x0000
+JAL PortalBarrier
+ADDIU A0, V0, 0x0000
+beq V0, R0, MoveBarrierDisplaced
+LD V0, 0x0038 (SP)
+LD A0, 0x0010 (SP)
+LD A1, 0x0018 (SP)
+LD A2, 0x0020 (SP)
+LD A3, 0x0028 (SP)
+LD V1, 0x0030 (SP)
+LD V0, 0x0038 (SP)
+LD S0, 0x0040 (SP)
+ADDIU S0, S0, 0x0001
+J 0x801202D8
+NOP
