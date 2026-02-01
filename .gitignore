@@ -66,6 +66,14 @@ Output Logs/
 /datapackage
 /custom_worlds
 
+#Gex ROM
+Gex_hack/n64/tools/mips64/
+Gex_hack/n64/tools/libdragon/
+Gex_hack/n64/tools/armips.exe
+*.o
+*.d
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

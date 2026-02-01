@@ -8,6 +8,8 @@ bool dpad_downpressed = false;
 bool dpad_leftpressed = false;
 bool still_pressed = false;
 bool init = false;
+u16 voiceline = 0x15D;
+bool voice_override = false;
 
 void remote_amount();
 void red_remote_stats(u8, int, int, int);
@@ -29,10 +31,14 @@ bool pre_loop()
     init = true;
     initialize();
   }
-  
+  gex_red_remotes_locations.FS_RR1 = 1;
+  gex_red_remotes_locations.NWF_RR1 = 1;
+  //ap_memory.pc.items[AP_RED_REMOTE] = 35;
+  //ap_memory.pc.items[AP_GOLD_REMOTE] = 35;
   remote_amount();
-  if(controller->d_down)
+  if(controller->dpad_down)
   {
+    ap_memory.pc.items[AP_JUMP] = 1;
     if(still_pressed){
       dpad_upressed = false;
     }
@@ -42,8 +48,10 @@ bool pre_loop()
 
     }
   }
-  else if(controller->d_up)
+  else if(controller->dpad_up)
   {
+    voice_override = true;
+    gex_voice_timer = 0x01;
     if(still_pressed){
       dpad_downpressed = false;
     }
@@ -53,7 +61,7 @@ bool pre_loop()
 
     }
   }
-  else if(controller->d_left)
+  else if(controller->dpad_left)
   {
     if(still_pressed){
       dpad_leftpressed = false;
@@ -73,16 +81,16 @@ bool pre_loop()
   }
  
   // dpad_upressed = true;
-  if(dpad_upressed == true)
-  {
-    // ap_memory.pc.items[AP_SILVER_REMOTE]++;
-    ap_memory.pc.items[AP_GOLD_REMOTE]++;
-  }
-  if(dpad_downpressed == true)
-  {
-    ap_memory.pc.items[AP_RED_REMOTE]++;
-    // ap_memory.pc.items[AP_SILVER_REMOTE]++;
-  }
+  // if(dpad_upressed == true)
+  // {
+  //   // ap_memory.pc.items[AP_SILVER_REMOTE]++;
+  //   ap_memory.pc.items[AP_GOLD_REMOTE]++;
+  // }
+  // if(dpad_downpressed == true)
+  // {
+  //   ap_memory.pc.items[AP_RED_REMOTE]++;
+  //   // ap_memory.pc.items[AP_SILVER_REMOTE]++;
+  // }
 
   
   return gex_fn_unknown_start_loop();
@@ -204,14 +212,100 @@ u8 gold_remote_bit_setter(u8 remotes)
  
 }
 
+u32 worldgate_unlock()
+{
+  if(gex_previous_opened_gate > HUB_GILLIGEX)
+  {
+    gex_previous_opened_gate = 0;
+  }
+  return 0x80;
+}
+
+void init_object(u32 unknown_ptr, u32 object, u32 unknown_ptr2, u32 unknown)
+{
+  switch (object)
+  {
+  case HUB_POST_OBJ:
+    util_inject(UTIL_INJECT_FUNCTION, 0x8015E6B0, (u32)worldgate_unlock, 0);
+    util_inject(UTIL_INJECT_RAW, 0x8015EE60, 0, 0); //Disables Demo Mode
+    break;
+  default:
+    break;
+  }
+  return gex_fn_unknown_init_object(unknown_ptr, object, unknown_ptr2, unknown);
+}
+
+void change_world(u32 world_ptr, u32 map_tmp_ptr, u32 big_obj_ptr)
+{
+  gex_fn_warp(world_ptr, map_tmp_ptr, big_obj_ptr);
+  if(gex_world_id == MAP_OOT_ID)
+  {
+    gex_world_id = MAP_IDN_ID;
+  }
+}
+
+void input_lock(u32 unknown_ptr, u16 input)
+{
+  switch (input)
+  {
+  case BUTTON_R:
+    if(ap_memory.pc.items[AP_LICK])
+    {
+      return gex_fn_input_control(unknown_ptr, input);
+    }
+    return;
+  case BUTTON_Z:
+    if(ap_memory.pc.items[AP_CROUCH])
+    {
+      return gex_fn_input_control(unknown_ptr, input);
+    }
+    return;
+  case BUTTON_AB:
+    if(ap_memory.pc.items[AP_JUMP] && ap_memory.pc.items[AP_WHIP])
+    {
+      return gex_fn_input_control(unknown_ptr, input);
+    }
+    return;
+  case BUTTON_A:
+    if(ap_memory.pc.items[AP_JUMP])
+    {
+      return gex_fn_input_control(unknown_ptr, input);
+    }
+    return;
+  case BUTTON_B:
+    if(ap_memory.pc.items[AP_WHIP])
+    {
+      return gex_fn_input_control(unknown_ptr, input);
+    }
+    return;
+  default:
+    return gex_fn_input_control(unknown_ptr, input);
+  }
+}
+
+void voice_changer(u16 voice_id)
+{
+  if(voice_override)
+  {
+    voice_override = false;
+    voiceline++;
+    return gex_fn_voiceline(voiceline);
+  }
+  return gex_fn_voiceline(voice_id);
+}
+
 u32 inject_hooks() {
   AP_MEMORY_PTR = &ap_memory;
   util_inject(UTIL_INJECT_FUNCTION, 0x80057964, (u32)pre_loop, 0);
   // util_inject(UTIL_INJECT_FUNCTION, 0x8007F3C1, (u32)pre_loop, 0);
-  util_inject(UTIL_INJECT_FUNCTION, 0x800130C0 , 0, 0);
+  // util_inject(UTIL_INJECT_FUNCTION, 0x800130C0 , 0, 0); //Crashes Game.
   // util_inject(UTIL_INJECT_FUNCTION, 0x80040668, (u32)remote_amount, 1);
-  util_inject(UTIL_INJECT_RAW, 0x8000CA48, 0, 0);
-  
+  util_inject(UTIL_INJECT_RAW, 0x8000CA48, 0, 0); //Collect Red Remote
+  util_inject(UTIL_INJECT_FUNCTION, 0x8003A43C, (u32)input_lock, 1); //Locks input unless AP item sent
+
+  util_inject(UTIL_INJECT_FUNCTION, 0x80064A60, (u32)init_object, 1); // Open parts of the world, disabled demo mode
+  util_inject(UTIL_INJECT_FUNCTION, 0x8002AD7C, (u32)change_world, 0); //Randomize TV worlds
+  util_inject(UTIL_INJECT_FUNCTION, 0x800527A4, (u32)voice_changer, 0);
   return 0;
 }
 
