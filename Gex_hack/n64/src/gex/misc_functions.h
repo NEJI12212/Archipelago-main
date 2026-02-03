@@ -42,4 +42,14 @@ enum {
 // function starts 0x8015EA98
 //memory 80161670 u32. if value is 0x04B1, Enter's DEMO Mode
 //Disabled by NOPing the ASM Code itself since its part of the Hub Object 
+
+
+// 0x80040668 JAL 0x8001A310
+// Above gets run when looking at totals menu. the JAL above counts the remotes 
+// The total remotes goes into the first byte in SP value
+// 0x80040704 JAL 8005C290. 2 lines above it puts the SP value into A2.
+
+typedef void (*gex_fnt_red_totals)(u32 unknown_ptr, u32 unknown_ptr2, u32 red_remotes, u32 unkown);
+#define gex_fn_red_totals ((gex_fnt_red_totals)0x8005C290)
+
 #endif

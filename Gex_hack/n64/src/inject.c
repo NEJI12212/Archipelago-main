@@ -3,7 +3,7 @@
 #include "util.h"
 #include "gex.h"
 #include "gex/items.h"
-bool dpad_upressed = false;
+bool dpad_uppressed = false;
 bool dpad_downpressed = false;
 bool dpad_leftpressed = false;
 bool still_pressed = false;
@@ -18,40 +18,20 @@ void gold_remote_stats(u8, int, int);
 
 void initialize()
 {
-  // ap_memory.pc.items[AP_RED_REMOTE] = 1;
+  ap_memory.pc.items[AP_RED_REMOTE] = 1;
   // ap_memory.pc.items[AP_SILVER_REMOTE] = 1;
   // ap_memory.pc.items[AP_GOLD_REMOTE] = 0;
 
 }
 
-bool pre_loop()
+void dpad_debug()
 {
-  if(!init)
-  {
-    init = true;
-    initialize();
-  }
-  gex_red_remotes_locations.FS_RR1 = 1;
-  gex_red_remotes_locations.NWF_RR1 = 1;
-  //ap_memory.pc.items[AP_RED_REMOTE] = 35;
-  //ap_memory.pc.items[AP_GOLD_REMOTE] = 35;
-  remote_amount();
   if(controller->dpad_down)
   {
-    ap_memory.pc.items[AP_JUMP] = 1;
-    if(still_pressed){
-      dpad_upressed = false;
+    if(dpad_downpressed)
+    {
+      ap_memory.pc.items[AP_JUMP] = 1;
     }
-    else{
-      dpad_upressed = true;
-      still_pressed = true;
-
-    }
-  }
-  else if(controller->dpad_up)
-  {
-    voice_override = true;
-    gex_voice_timer = 0x01;
     if(still_pressed){
       dpad_downpressed = false;
     }
@@ -61,24 +41,60 @@ bool pre_loop()
 
     }
   }
+  else if(controller->dpad_up)
+  {
+    if(dpad_uppressed)
+    {
+      voice_override = true;
+      gex_voice_timer = 0x01;    
+    }
+    if(still_pressed){
+      dpad_uppressed = false;
+    }
+    else{
+      dpad_uppressed = true;
+      still_pressed = true;
+
+    }
+  }
   else if(controller->dpad_left)
   {
+    if(dpad_leftpressed)
+    {
+      ap_memory.pc.items[AP_RED_REMOTE]++;
+    }
     if(still_pressed){
       dpad_leftpressed = false;
     }
     else{
       dpad_leftpressed = true;
       still_pressed = true;
-
     }
   }
   else
   {
     dpad_leftpressed = false;
     dpad_downpressed = false;
-    dpad_upressed = false;
+    dpad_uppressed = false;
     still_pressed = false;
   }
+}
+
+bool pre_loop()
+{
+  if(!init)
+  {
+    init = true;
+    initialize();
+  }
+  dpad_debug();
+  // gex_red_remotes_locations.FS_RR1 = 1;
+  // gex_red_remotes_locations.NWF_RR1 = 1;
+  //ap_memory.pc.items[AP_RED_REMOTE] = 35;
+  //ap_memory.pc.items[AP_GOLD_REMOTE] = 35;
+
+  //remote_amount();
+  
  
   // dpad_upressed = true;
   // if(dpad_upressed == true)
@@ -218,7 +234,11 @@ u32 worldgate_unlock()
   {
     gex_previous_opened_gate = 0;
   }
-  return 0x80;
+  if(ap_memory.pc.items[AP_RED_REMOTE] >= 3)
+  {
+    return 0x80;
+  }
+  return 0;
 }
 
 void init_object(u32 unknown_ptr, u32 object, u32 unknown_ptr2, u32 unknown)
@@ -294,18 +314,24 @@ void voice_changer(u16 voice_id)
   return gex_fn_voiceline(voice_id);
 }
 
+void red_totals_override(u32 ptr1, u32 ptr2, u32 red_remotes, u32 unknown)
+{
+  return gex_fn_red_totals(ptr1, ptr2, ap_memory.pc.items[AP_RED_REMOTE], unknown);
+}
+
 u32 inject_hooks() {
   AP_MEMORY_PTR = &ap_memory;
   util_inject(UTIL_INJECT_FUNCTION, 0x80057964, (u32)pre_loop, 0);
   // util_inject(UTIL_INJECT_FUNCTION, 0x8007F3C1, (u32)pre_loop, 0);
   // util_inject(UTIL_INJECT_FUNCTION, 0x800130C0 , 0, 0); //Crashes Game.
   // util_inject(UTIL_INJECT_FUNCTION, 0x80040668, (u32)remote_amount, 1);
-  util_inject(UTIL_INJECT_RAW, 0x8000CA48, 0, 0); //Collect Red Remote
+  // util_inject(UTIL_INJECT_RAW, 0x8000CA48, 0, 0); //Collect Red Remote //Might not need this, reading totals directly at APMemory
   util_inject(UTIL_INJECT_FUNCTION, 0x8003A43C, (u32)input_lock, 1); //Locks input unless AP item sent
 
   util_inject(UTIL_INJECT_FUNCTION, 0x80064A60, (u32)init_object, 1); // Open parts of the world, disabled demo mode
   util_inject(UTIL_INJECT_FUNCTION, 0x8002AD7C, (u32)change_world, 0); //Randomize TV worlds
   util_inject(UTIL_INJECT_FUNCTION, 0x800527A4, (u32)voice_changer, 0);
+  util_inject(UTIL_INJECT_FUNCTION, 0x80040704, (u32)red_totals_override, 0);
   return 0;
 }
 
