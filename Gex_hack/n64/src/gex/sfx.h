@@ -8,7 +8,7 @@
     // voice memory address 80154833
     // u32 80156854 - Timer for Voice if = 0x01
 
-    enum {
+    typedef enum {
         BLURB = 0x01,
         FELL,
         COLLECTED,
@@ -32,7 +32,7 @@
     } sfx_enum;
 
     //Voicelines start at ID 0x160 ands at 0x1CC
-    // enum {
+    // typedef enum {
 
     // } voicelines_enum;
 

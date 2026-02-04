@@ -106,7 +106,23 @@ typedef struct {
 #define gex_gold_remotes_levels (*(gold_remotes_t*)0x800C5758) //actually its a u32 in size
 #define gex_gold_remotes_locations (*(gold_remote_locations_t*)0x800C5758)
 
-enum {
+#define gex_mcguffins_1 (*(u32*)0x800C56BC) // max: 0x1E
+#define gex_mcguffins_2 (*(u32*)0x800C56C0) // max: 0x28
+#define gex_mcguffins_3 (*(u32*)0x800C56C4) // max: 0x32 // Silver Remote
+
+
+
+
+typedef void (*gex_fnt_next_mcguffin)(u32 unknown_ptr, u8 mcguffin_step);
+#define gex_fn_next_mcguffin ((gex_fnt_next_mcguffin)0x8000B3B4)
+//0x8000BE1C JAL 0x8000B3B4 - Sends the Silver Remote + change mcguffins icon
+// A0: Ptr Nothing
+// A1: 1 2 3
+// A2: 1 //Always 1
+// A3: A
+// A1 controls the icon / remote
+
+typedef enum {
     RED_REMOTE_OOT = 0x800C572E, // -> 0x800C573B
     SILVER_REMOTE_OOT = 0x800C5754, // -> 0x800C5754
     GOLD_REMOTE = 0x800C5758, // -> 0x800C575A
@@ -115,6 +131,6 @@ enum {
     // 3rd token 800C56C7 
     HUB_OBJECT = 0x000BA150,
     HUB_POST_OBJ = 0x0049D870
-};
+} common_t;
 
 #endif

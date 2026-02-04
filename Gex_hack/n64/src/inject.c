@@ -1,8 +1,8 @@
 #include <stdint.h>
 #include <stdbool.h>
-#include "util.h"
 #include "gex.h"
-#include "gex/items.h"
+#include "world_unlocks.h"
+
 bool dpad_uppressed = false;
 bool dpad_downpressed = false;
 bool dpad_leftpressed = false;
@@ -16,13 +16,6 @@ void red_remote_stats(u8, int, int, int);
 void silver_remote_stats(u8, int, int, int);
 void gold_remote_stats(u8, int, int);
 
-void initialize()
-{
-  ap_memory.pc.items[AP_RED_REMOTE] = 1;
-  // ap_memory.pc.items[AP_SILVER_REMOTE] = 1;
-  // ap_memory.pc.items[AP_GOLD_REMOTE] = 0;
-
-}
 
 void dpad_debug()
 {
@@ -31,6 +24,10 @@ void dpad_debug()
     if(dpad_downpressed)
     {
       ap_memory.pc.items[AP_JUMP] = 1;
+      ap_memory.pc.items[AP_CROUCH] = 1;
+      ap_memory.pc.items[AP_WHIP] = 1;
+      ap_memory.pc.items[AP_CROUCH] = 1;
+      ap_memory.pc.items[AP_LICK] = 1;
     }
     if(still_pressed){
       dpad_downpressed = false;
@@ -45,8 +42,9 @@ void dpad_debug()
   {
     if(dpad_uppressed)
     {
-      voice_override = true;
-      gex_voice_timer = 0x01;    
+      ap_memory.pc.items[AP_RED_REMOTE]++;
+      ap_memory.pc.items[AP_SILVER_REMOTE]++;
+      ap_memory.pc.items[AP_GOLD_REMOTE]++;
     }
     if(still_pressed){
       dpad_uppressed = false;
@@ -61,7 +59,8 @@ void dpad_debug()
   {
     if(dpad_leftpressed)
     {
-      ap_memory.pc.items[AP_RED_REMOTE]++;
+      voice_override = true;
+      gex_voice_timer = 0x01;
     }
     if(still_pressed){
       dpad_leftpressed = false;
@@ -80,35 +79,31 @@ void dpad_debug()
   }
 }
 
+void initialize()
+{
+  // ap_memory.pc.items[AP_RED_REMOTE] = 1;
+  // ap_memory.pc.items[AP_SILVER_REMOTE] = 1;
+  // ap_memory.pc.items[AP_GOLD_REMOTE] = 0;
+
+}
+
+
+
 bool pre_loop()
 {
   if(!init)
   {
-    init = true;
     initialize();
+    init = true;
   }
   dpad_debug();
-  // gex_red_remotes_locations.FS_RR1 = 1;
-  // gex_red_remotes_locations.NWF_RR1 = 1;
-  //ap_memory.pc.items[AP_RED_REMOTE] = 35;
-  //ap_memory.pc.items[AP_GOLD_REMOTE] = 35;
-
+  if(ap_memory.pc.items[AP_RED_REMOTE] >= 3)
+  {
+    ap_memory.pc.items[AP_GILLIGEX] = 1;
+  }
+  //ap_memory.pc.items[AP_SILVER_REMOTE] = 35;
+  //gex_mcguffins_1 = 0x1D;
   //remote_amount();
-  
- 
-  // dpad_upressed = true;
-  // if(dpad_upressed == true)
-  // {
-  //   // ap_memory.pc.items[AP_SILVER_REMOTE]++;
-  //   ap_memory.pc.items[AP_GOLD_REMOTE]++;
-  // }
-  // if(dpad_downpressed == true)
-  // {
-  //   ap_memory.pc.items[AP_RED_REMOTE]++;
-  //   // ap_memory.pc.items[AP_SILVER_REMOTE]++;
-  // }
-
-  
   return gex_fn_unknown_start_loop();
 }
 
@@ -230,15 +225,7 @@ u8 gold_remote_bit_setter(u8 remotes)
 
 u32 worldgate_unlock()
 {
-  if(gex_previous_opened_gate > HUB_GILLIGEX)
-  {
-    gex_previous_opened_gate = 0;
-  }
-  if(ap_memory.pc.items[AP_RED_REMOTE] >= 3)
-  {
-    return 0x80;
-  }
-  return 0;
+  return unlock_worlds();
 }
 
 void init_object(u32 unknown_ptr, u32 object, u32 unknown_ptr2, u32 unknown)
@@ -316,22 +303,40 @@ void voice_changer(u16 voice_id)
 
 void red_totals_override(u32 ptr1, u32 ptr2, u32 red_remotes, u32 unknown)
 {
-  return gex_fn_red_totals(ptr1, ptr2, ap_memory.pc.items[AP_RED_REMOTE], unknown);
+  return gex_fn_remote_totals(ptr1, ptr2, ap_memory.pc.items[AP_RED_REMOTE], unknown);
+}
+
+void silver_totals_override(u32 ptr1, u32 ptr2, u32 red_remotes, u32 unknown)
+{
+  return gex_fn_remote_totals(ptr1, ptr2, ap_memory.pc.items[AP_SILVER_REMOTE], unknown);
+}
+
+void gold_totals_override(u32 ptr1, u32 ptr2, u32 red_remotes, u32 unknown)
+{
+  return gex_fn_remote_totals(ptr1, ptr2, ap_memory.pc.items[AP_GOLD_REMOTE], unknown);
+}
+
+void mcguffin_set(u32 unknown_ptr, u8 set)
+{
+  return gex_fn_next_mcguffin(unknown_ptr, 3);
 }
 
 u32 inject_hooks() {
   AP_MEMORY_PTR = &ap_memory;
   util_inject(UTIL_INJECT_FUNCTION, 0x80057964, (u32)pre_loop, 0);
-  // util_inject(UTIL_INJECT_FUNCTION, 0x8007F3C1, (u32)pre_loop, 0);
-  // util_inject(UTIL_INJECT_FUNCTION, 0x800130C0 , 0, 0); //Crashes Game.
   // util_inject(UTIL_INJECT_FUNCTION, 0x80040668, (u32)remote_amount, 1);
   // util_inject(UTIL_INJECT_RAW, 0x8000CA48, 0, 0); //Collect Red Remote //Might not need this, reading totals directly at APMemory
   util_inject(UTIL_INJECT_FUNCTION, 0x8003A43C, (u32)input_lock, 1); //Locks input unless AP item sent
 
-  util_inject(UTIL_INJECT_FUNCTION, 0x80064A60, (u32)init_object, 1); // Open parts of the world, disabled demo mode
-  util_inject(UTIL_INJECT_FUNCTION, 0x8002AD7C, (u32)change_world, 0); //Randomize TV worlds
+  //util_inject(UTIL_INJECT_FUNCTION, 0x80064A60, (u32)init_object, 1); // Open parts of the world, disabled demo mode
+  //util_inject(UTIL_INJECT_FUNCTION, 0x8002AD7C, (u32)change_world, 0); //Randomize TV worlds
   util_inject(UTIL_INJECT_FUNCTION, 0x800527A4, (u32)voice_changer, 0);
-  util_inject(UTIL_INJECT_FUNCTION, 0x80040704, (u32)red_totals_override, 0);
+
+  util_inject(UTIL_INJECT_FUNCTION, 0x80040704, (u32)red_totals_override, 0); //override the red remote count in totals screen
+  util_inject(UTIL_INJECT_FUNCTION, 0x8004072C, (u32)silver_totals_override, 0); //override the silver remote count in totals screen
+  util_inject(UTIL_INJECT_FUNCTION, 0x80040754, (u32)gold_totals_override, 0); //override the gold remote count in totals screen
+
+  util_inject(UTIL_INJECT_FUNCTION, 0x8000BE1C, (u32)mcguffin_set, 0); //Handles which set of mcguffins to show / Silver Remote
   return 0;
 }
 
@@ -393,7 +398,6 @@ void remote_amount()
   gold_remote_stats(gold_max_remote, min, max);
 
 }
-
 
 void red_remote_stats(u8 max_remote, int min_amount, int upper_amount, int i)
 {

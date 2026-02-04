@@ -4,13 +4,13 @@
 #define gex_world_id (*(u8*)0x800C5761)
 #define gex_world_mission (*(u32*)0x800C5794)
 
-enum {
+typedef enum {
     MAP_OOT_PTR = 0x8025ED3C,
     MAP_SR_PTR = 0x8025ED48,
 
 } map_ptrs;
 
-enum {
+typedef enum {
     MAP_OOT_ID = 0x00,
     MAP_SR_ID,
     MAP_GC_ID,

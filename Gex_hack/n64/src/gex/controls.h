@@ -22,7 +22,7 @@ typedef struct {
 
 //0x8003A43C JAL 0x8004A350 controls input of buttons (not movement)
 
-enum {
+typedef enum {
  BUTTON_R = 0x0010,
  BUTTON_L = 0x0020,
  BUTTON_Z = 0x2000,

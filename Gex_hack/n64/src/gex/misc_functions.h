@@ -28,12 +28,28 @@ typedef void (*gex_fnt_unknown_init_object)(u32 unknown_ptr, u32 object, u32 unk
  80
  100
 */
-
-enum {
-    HUB_NOTHING = 0x0,
-    HUB_GILLIGEX = 0x80,
-    HUB_MOOSHOO = 0x180,
-    HUB_FAR_GATE = 0x2180,
+/*
+ For Bonus levels:
+ table starts at 80161178 every 32-bits up to the ptr.
+*/
+typedef enum {
+    HUB_NOTHING = 0b0,
+    HUB_AZTEC_2_STEP = 0b1,
+    HUB_THURSDAY_12 = 0b10,
+    HUB_DRAG_NET = 0b100,
+    HUB_SPY_WHO = 0b1000,
+    HUB_CHINA_SHOP = 0b10000,
+    HUB_BUGGED_OUT = 0b100000,
+    HUB_CHIPS_DIP = 0b1000000,
+    HUB_GILLIGEX = 0b10000000,
+    HUB_MOOSHOO = 0b100000000,
+    HUB_GEXZILLA = 0b1000000000,
+    HUB_CHANNEL_Z = 0b10000000000,
+    HUB_FRONT_GATE = 0b100000000000,
+    HUB_RED_GATE = 0b1000000000000,
+    HUB_GREEN_GATE = 0b10000000000000,
+    HUB_BLUE_GATE = 0b100000000000000,
+    HUB_LION = 0b1000000000000000,
 } hub_objects;
 
 #define gex_previous_opened_gate (*(u32*)0x800C575C)
@@ -46,10 +62,15 @@ enum {
 
 // 0x80040668 JAL 0x8001A310
 // Above gets run when looking at totals menu. the JAL above counts the remotes 
-// The total remotes goes into the first byte in SP value
-// 0x80040704 JAL 8005C290. 2 lines above it puts the SP value into A2.
+// The total Red remotes goes into the first byte in SP value
+// The total Silver remotes goes into the second byte in SP value
+// The total Gold remotes goes into the third byte in SP value
+// 0x80040704 JAL 8005C290. 2 lines above it puts the first byte SP value into A2.
+// 0x8004072C JAL 8005C290. 2 lines above it puts the second byte SP value into A2.
+// 0x80040754 JAL 8005C290. 2 lines above it puts the third byte SP value into A2.
 
-typedef void (*gex_fnt_red_totals)(u32 unknown_ptr, u32 unknown_ptr2, u32 red_remotes, u32 unkown);
-#define gex_fn_red_totals ((gex_fnt_red_totals)0x8005C290)
+
+typedef void (*gex_fnt_remote_totals)(u32 unknown_ptr, u32 unknown_ptr2, u32 red_remotes, u32 unkown);
+#define gex_fn_remote_totals ((gex_fnt_remote_totals)0x8005C290)
 
 #endif
