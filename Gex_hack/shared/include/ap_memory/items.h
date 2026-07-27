@@ -6,6 +6,14 @@ enum {
     AP_SILVER_REMOTE,
     AP_GOLD_REMOTE,
     AP_GILLIGEX,
+    AP_MOOSHOO,
+    AP_GEXZILLA,
+    AP_CHANNEL_Z,
+    AP_FRONT_GATE,
+    AP_RED_GATE,
+    AP_GREEN_GATE,
+    AP_BLUE_GATE,
+    AP_LION_GATE,
     AP_JUMP,
     AP_WHIP,
     AP_LICK,
@@ -16,3 +24,14 @@ enum {
 
 
 #endif
+
+
+
+// HUB_NOTHING = 0b0,
+//     HUB_AZTEC_2_STEP = 0b1,
+//     HUB_THURSDAY_12 = 0b10,
+//     HUB_DRAG_NET = 0b100,
+//     HUB_SPY_WHO = 0b1000,
+//     HUB_CHINA_SHOP = 0b10000,
+//     HUB_BUGGED_OUT = 0b100000,
+//     HUB_CHIPS_DIP = 0b1000000,

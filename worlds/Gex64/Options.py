@@ -13,6 +13,14 @@ class RandomizeBossGoldRemotes(DefaultOnToggle):
     """Bosses Gold Remotes are randomized."""
     display_name = "Randomize Bosses Gold Remotes"
 
+class RandomizeGates(DefaultOffToggle):
+    """Gates are in the random pool."""
+    display_name = "Randomize Gates"
+
+class RandomizeBossAndBonusTV(DefaultOffToggle):
+    """Boss and bonus stages are in the pool."""
+    display_name = "Randomize Unlocking Bonus Levels and Boss Levels"
+
 @dataclass
 class GexOptions(PerGameCommonOptions):
     

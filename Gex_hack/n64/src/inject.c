@@ -59,6 +59,9 @@ void dpad_debug()
   {
     if(dpad_leftpressed)
     {
+      ap_memory.pc.items[AP_GILLIGEX]=1;
+      ap_memory.pc.items[AP_FRONT_GATE]=1;
+      ap_memory.pc.items[AP_RED_GATE]=1;
       voice_override = true;
       gex_voice_timer = 0x01;
     }
@@ -328,7 +331,7 @@ u32 inject_hooks() {
   // util_inject(UTIL_INJECT_RAW, 0x8000CA48, 0, 0); //Collect Red Remote //Might not need this, reading totals directly at APMemory
   util_inject(UTIL_INJECT_FUNCTION, 0x8003A43C, (u32)input_lock, 1); //Locks input unless AP item sent
 
-  //util_inject(UTIL_INJECT_FUNCTION, 0x80064A60, (u32)init_object, 1); // Open parts of the world, disabled demo mode
+  util_inject(UTIL_INJECT_FUNCTION, 0x80064A60, (u32)init_object, 1); // Open parts of the world, disabled demo mode
   //util_inject(UTIL_INJECT_FUNCTION, 0x8002AD7C, (u32)change_world, 0); //Randomize TV worlds
   util_inject(UTIL_INJECT_FUNCTION, 0x800527A4, (u32)voice_changer, 0);
 

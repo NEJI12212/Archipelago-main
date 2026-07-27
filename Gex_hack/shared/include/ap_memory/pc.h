@@ -19,6 +19,7 @@ typedef int64_t s64;
 
 typedef struct {
     u8 items[AP_ITEM_MAX];
+    bool keys;
 } ap_memory_pc_t;
 
 #endif
