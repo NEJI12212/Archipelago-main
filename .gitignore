@@ -32,6 +32,7 @@
 *.apsave
 *.BIN
 *.puml
+*.o
 
 setups
 build
@@ -210,3 +211,4 @@ minecraft_versions.json
 .LSOverride
 Thumbs.db
 [Dd]esktop.ini
+asm_symbols.txt
